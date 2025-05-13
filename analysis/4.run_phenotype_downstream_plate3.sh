@@ -3,19 +3,20 @@
 # Log all output to a log file (stdout and stderr)
 mkdir -p slurm/slurm_output/main
 start_time_formatted=$(date +%Y%m%d_%H%M%S)
-log_file="slurm/slurm_output/main/sbs-${start_time_formatted}.log"
+log_file="slurm/slurm_output/main/phenotype-${start_time_formatted}.log"
 exec > >(tee -a "$log_file") 2>&1
 
 # Start timing
 start_time=$(date +%s)
 
 # TODO: Set number of plates to process
-NUM_PLATES=None
+NUM_PLATES=3
+RUN_DOWNSTREAM=True
 
 echo "===== STARTING SEQUENTIAL PROCESSING OF $NUM_PLATES PLATES ====="
 
 # Process each plate in sequence
-for PLATE in $(seq 1 $NUM_PLATES); do
+for PLATE in 3; do
     echo ""
     echo "==================== PROCESSING PLATE $PLATE ===================="
     echo "Started at: $(date)"
@@ -31,19 +32,14 @@ for PLATE in $(seq 1 $NUM_PLATES); do
         --latency-wait 60 \
         --rerun-triggers mtime \
         --keep-going \
-        --groups align_sbs=extract_sbs_info_group \
-                apply_ic_field_sbs=extract_sbs_info_group \
-                segment_sbs=extract_sbs_info_group \
-                extract_sbs_info=extract_sbs_info_group \
-                log_filter=max_filter_group \
-                max_filter=max_filter_group \
-                compute_standard_deviation=find_peaks_group \
-                find_peaks=find_peaks_group \
-                extract_bases=call_cells_group \
-                call_reads=call_cells_group \
-                call_cells=call_cells_group \
-        --until all_sbs \
-        --config plate_filter=$PLATE
+        --groups apply_ic_field_phenotype=extract_phenotype_info_group \
+                align_phenotype=extract_phenotype_info_group \
+                segment_phenotype=extract_phenotype_info_group \
+                extract_phenotype_info=extract_phenotype_info_group \
+                identify_cytoplasm=extract_phenotype_cp_group \
+                extract_phenotype_cp=extract_phenotype_cp_group \
+        --until all_phenotype_downstream \
+        --config plate_filter=$PLATE run_downstream=$RUN_DOWNSTREAM
     
     # Check if Snakemake was successful
     if [ $? -ne 0 ]; then

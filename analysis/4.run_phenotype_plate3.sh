@@ -11,11 +11,12 @@ start_time=$(date +%s)
 
 # TODO: Set number of plates to process
 NUM_PLATES=None
+RUN_DOWNSTREAM=False
 
 echo "===== STARTING SEQUENTIAL PROCESSING OF $NUM_PLATES PLATES ====="
 
 # Process each plate in sequence
-for PLATE in $(seq 1 $NUM_PLATES); do
+for PLATE in 3; do
     echo ""
     echo "==================== PROCESSING PLATE $PLATE ===================="
     echo "Started at: $(date)"
@@ -38,7 +39,7 @@ for PLATE in $(seq 1 $NUM_PLATES); do
                 identify_cytoplasm=extract_phenotype_cp_group \
                 extract_phenotype_cp=extract_phenotype_cp_group \
         --until all_phenotype \
-        --config plate_filter=$PLATE
+        --config plate_filter=$PLATE run_downstream=$RUN_DOWNSTREAM
     
     # Check if Snakemake was successful
     if [ $? -ne 0 ]; then

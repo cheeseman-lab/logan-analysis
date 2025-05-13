@@ -2,3 +2,9 @@
 analysis/.snakemake/
 analysis/slurm/slurm_output/
 analysis/analysis_root/
+analysis/analysis_root_old/
+
+# ignore training files that aren't useful
+analysis/4a.clean_manual.ipynb
+analysis/5.train_classifier.ipynb
+analysis/5.train_classifier.py
